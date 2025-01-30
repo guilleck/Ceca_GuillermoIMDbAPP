@@ -15,9 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,23 +110,13 @@ public class HomeFragment extends Fragment {
         });
 
         adapter.setOnItemLongClickListener(movie -> {
-            String userID = getGoogleUserId();
-            favoritesManager.addFavorite(movie,userID);
+            favoritesManager.addFavorite(movie);
             movieList.add(movie);
             adapter.notifyItemInserted(movieList.size() - 1);
             Toast.makeText(getContext(), "Película añadida a favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
         });
 
         return root;
-    }
-
-    public String getGoogleUserId() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            return user.getUid();
-        } else {
-            return null;
-        }
     }
 
 

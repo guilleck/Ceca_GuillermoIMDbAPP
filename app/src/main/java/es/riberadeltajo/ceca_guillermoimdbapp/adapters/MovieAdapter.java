@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private List<Movie> movieList = new ArrayList<>();
     private OnItemLongClickListener onItemLongClickListener;
     private FavoritesManager favoritesManager;
+
 
 
     public MovieAdapter(Context context, List<Movie> movieList) {
@@ -75,15 +78,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 .into(holder.posterImageView);
 
         holder.itemView.setOnLongClickListener(v -> {
-            if (isMovieInFavorites(movie)) {
-                favoritesManager.removeFavorite(movie);
-                movieList.remove(position);
-                notifyItemRemoved(position);
+            String userID = getGoogleUserId();
+
+            if (isMovieInFavorites(movie,userID)) {
+                favoritesManager.removeFavorite(movie,userID);
                 Toast.makeText(context, "Eliminada de favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
             } else {
-                favoritesManager.addFavorite(movie);
+                favoritesManager.addFavorite(movie,userID);
                 Toast.makeText(context, "Agregada a favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
             }
+            notifyItemChanged(position);
             return true;
         });
     }
@@ -96,8 +100,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void setOnItemLongClickListener(OnItemLongClickListener listener) {
         this.onItemLongClickListener = listener;
     }
-    private boolean isMovieInFavorites(Movie movie) {
-        List<Movie> favorites = favoritesManager.getFavorites();
+    private boolean isMovieInFavorites(Movie movie, String userId) {
+        List<Movie> favorites = favoritesManager.getFavorites(userId);
         for (Movie m : favorites) {
             if (m.getId().equals(movie.getId())) {
                 return true;
@@ -122,6 +126,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         movieList.clear();
         movieList.addAll(newMovieList);
         notifyDataSetChanged();
+    }
+
+    public String getGoogleUserId() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            return user.getUid();
+        } else {
+            return null;
+        }
     }
 
 

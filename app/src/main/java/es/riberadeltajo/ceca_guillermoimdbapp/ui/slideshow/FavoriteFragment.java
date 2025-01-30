@@ -19,6 +19,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -60,7 +62,8 @@ public class FavoriteFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemLongClickListener(movie -> {
-            favoritesManager.removeFavorite(movie);
+            String userID = getGoogleUserId();
+            favoritesManager.removeFavorite(movie,userID);
             movieList.remove(movie);
             adapter.notifyDataSetChanged();
             Toast.makeText(getContext(), "Eliminada de favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
@@ -75,11 +78,23 @@ public class FavoriteFragment extends Fragment {
     }
 
     private void loadFavorites() {
-        List<Movie> favorites = favoritesManager.getFavorites();
+        String userID = getGoogleUserId();
+        if (userID == null) {
+            Toast.makeText(getContext(), "Error: No se pudo obtener el usuario", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        List<Movie> favorites = favoritesManager.getFavorites(userID);
+        if (favorites == null) {
+            favorites = new ArrayList<>();
+        }
+
         movieList.clear();
         movieList.addAll(favorites);
         adapter.notifyDataSetChanged();
     }
+
+
     private void shareFavorites() {
         Gson gson = new Gson();
         String jsonFavorites = gson.toJson(movieList);
@@ -104,6 +119,20 @@ public class FavoriteFragment extends Fragment {
         } else {
             shareFavorites();
         }
+    }
+
+    public String getGoogleUserId() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            return user.getUid();
+        } else {
+            return null;
+        }
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadFavorites();
     }
 
 

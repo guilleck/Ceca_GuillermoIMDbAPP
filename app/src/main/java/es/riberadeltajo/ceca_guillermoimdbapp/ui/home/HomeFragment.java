@@ -137,5 +137,15 @@ public class HomeFragment extends Fragment {
         binding = null;
     }
 
+    private boolean isMovieInFavorites(Movie movie, String userId) {
+        List<Movie> favorites = favoritesManager.getFavorites(userId);
+        for (Movie m : favorites) {
+            if (m.getId().equals(movie.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

@@ -9,7 +9,7 @@ import java.security.AccessControlContext;
 public class FavoritesDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "favorites.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 6;
 
     public static final String COLUMN_RATING = "rating";
     public static final String TABLE_FAVORITES = "favorites";

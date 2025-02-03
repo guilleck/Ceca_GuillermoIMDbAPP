@@ -81,8 +81,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             String userID = getGoogleUserId();
 
             if (isMovieInFavorites(movie,userID)) {
-                favoritesManager.removeFavorite(movie,userID);
-                Toast.makeText(context, "Eliminada de favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Esta película ya está en favoritos", Toast.LENGTH_SHORT).show();
             } else {
                 favoritesManager.addFavorite(movie,userID);
                 Toast.makeText(context, "Agregada a favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
